@@ -1,75 +1,265 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'My Awesome App',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-        ),
-        home: MyHomePage(),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Calculator(),
     );
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  WordPair current = WordPair.random();
-  void updateRandomWord() {
-    current = WordPair.random();
-    notifyListeners();
-  }
+class Calculator extends StatefulWidget {
+  @override
+  _CalculatorState createState() => _CalculatorState();
 }
 
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = Provider.of<MyAppState>(context);
-
-    return Scaffold(
-      body: Center(
-        child: Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,1
-            children: [
-              Text(
-                'Hello world!',
-                style: TextStyle(fontSize: 30),
-              ),
-              AnimatedSwitcher(
-                duration: Duration(milliseconds: 500),
-                child: Text(
-                  appState.current.asLowerCase,
-                  key: ValueKey(appState.current),
-                  style: TextStyle(fontSize: 30),
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 186, 246, 164),
-                    fixedSize: Size(200, 60)),
-                onPressed: () {
-                  appState.updateRandomWord();
-                },
-                child: Text('Learn English'),
-              ),
-            ],
+class _CalculatorState extends State<Calculator> {
+  dynamic displaytxt = 20;
+  //Button Widget
+  Widget calcbutton(String btntxt, Color btncolor, Color txtcolor) {
+    return Container(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(20),
+          shape: CircleBorder(),
+          backgroundColor: btncolor,
+        ),
+        onPressed: () {
+          calculation(btntxt);
+        },
+        child: Text(
+          btntxt,
+          style: TextStyle(
+            fontSize: 35,
+            color: txtcolor,
           ),
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //Calculator
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text('Calculator'),
+        backgroundColor: Colors.black,
+      ),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            // Calculator display
+            SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      '$text',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 100,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                calcbutton('AC', Colors.grey, Colors.black),
+                calcbutton('+/-', Colors.grey, Colors.black),
+                calcbutton('%', Colors.grey, Colors.black),
+                calcbutton('/', Colors.amber[700]!, Colors.white),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                calcbutton('7', Colors.grey[850]!, Colors.white),
+                calcbutton('8', Colors.grey[850]!, Colors.white),
+                calcbutton('9', Colors.grey[850]!, Colors.white),
+                calcbutton('x', Colors.amber[700]!, Colors.white),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                calcbutton('4', Colors.grey[850]!, Colors.white),
+                calcbutton('5', Colors.grey[850]!, Colors.white),
+                calcbutton('6', Colors.grey[850]!, Colors.white),
+                calcbutton('-', Colors.amber[700]!, Colors.white),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                calcbutton('1', Colors.grey[850]!, Colors.white),
+                calcbutton('2', Colors.grey[850]!, Colors.white),
+                calcbutton('3', Colors.grey[850]!, Colors.white),
+                calcbutton('+', Colors.amber[700]!, Colors.white),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                //this is button Zero
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.fromLTRB(34, 20, 128, 20),
+                    shape: StadiumBorder(),
+                    backgroundColor: Colors.grey[850],
+                  ),
+                  onPressed: () {
+                    calculation('0');
+                  },
+                  child: Text(
+                    '0',
+                    style: TextStyle(fontSize: 35, color: Colors.white),
+                  ),
+                ),
+                calcbutton('.', Colors.grey[850]!, Colors.white),
+                calcbutton('=', Colors.white, Colors.amber[700]!),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  //Calculator logic
+  dynamic text = '0';
+  double numOne = 0;
+  double numTwo = 0;
+
+  dynamic result = '';
+  dynamic finalResult = '';
+  dynamic opr = '';
+  dynamic preOpr = '';
+  void calculation(btnText) {
+    if (btnText == 'AC') {
+      text = '0';
+      numOne = 0;
+      numTwo = 0;
+      result = '';
+      finalResult = '0';
+      opr = '';
+      preOpr = '';
+    } else if (opr == '=' && btnText == '=') {
+      if (preOpr == '+') {
+        finalResult = add();
+      } else if (preOpr == '-') {
+        finalResult = sub();
+      } else if (preOpr == 'x') {
+        finalResult = mul();
+      } else if (preOpr == '/') {
+        finalResult = div();
+      }
+    } else if (btnText == '+' ||
+        btnText == '-' ||
+        btnText == 'x' ||
+        btnText == '/' ||
+        btnText == '=') {
+      if (numOne == 0) {
+        numOne = double.parse(result);
+      } else {
+        numTwo = double.parse(result);
+      }
+
+      if (opr == '+') {
+        finalResult = add();
+      } else if (opr == '-') {
+        finalResult = sub();
+      } else if (opr == 'x') {
+        finalResult = mul();
+      } else if (opr == '/') {
+        finalResult = div();
+      }
+      preOpr = opr;
+      opr = btnText;
+      result = '';
+    } else if (btnText == '%') {
+      result = numOne / 100;
+      finalResult = doesContainDecimal(result);
+    } else if (btnText == '.') {
+      if (!result.toString().contains('.')) {
+        result = '$result.';
+      }
+      finalResult = result;
+    } else if (btnText == '+/-') {
+      result.toString().startsWith('-')
+          ? result = result.toString().substring(1)
+          : result = '-$result';
+      finalResult = result;
+    } else {
+      result = result + btnText;
+      finalResult = result;
+    }
+
+    setState(() {
+      text = finalResult;
+    });
+  }
+
+  String add() {
+    result = (numOne + numTwo).toString();
+    numOne = double.parse(result);
+    return doesContainDecimal(result);
+  }
+
+  String sub() {
+    result = (numOne - numTwo).toString();
+    numOne = double.parse(result);
+    return doesContainDecimal(result);
+  }
+
+  String mul() {
+    result = (numOne * numTwo).toString();
+    numOne = double.parse(result);
+    return doesContainDecimal(result);
+  }
+
+  String div() {
+    result = (numOne / numTwo).toString();
+    numOne = double.parse(result);
+    return doesContainDecimal(result);
+  }
+
+  String doesContainDecimal(dynamic result) {
+    if (result.toString().contains('.')) {
+      List<String> splitDecimal = result.toString().split('.');
+      if (!(int.parse(splitDecimal[1]) > 0)) {
+        return result = splitDecimal[0].toString();
+      }
+    }
+    return result;
   }
 }
