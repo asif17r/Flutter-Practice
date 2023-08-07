@@ -43,7 +43,7 @@ class MyHomePage extends StatelessWidget {
         child: Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,1
             children: [
               Text(
                 'Hello world!',
@@ -59,9 +59,8 @@ class MyHomePage extends StatelessWidget {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Color.fromARGB(255, 186, 246, 164),
-                  fixedSize: Size(200, 60)
-                ),
+                    backgroundColor: Color.fromARGB(255, 186, 246, 164),
+                    fixedSize: Size(200, 60)),
                 onPressed: () {
                   appState.updateRandomWord();
                 },
