@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 void main() {
   runApp(PictureStoryApp());
@@ -64,10 +65,17 @@ class StoryLibraryScreen extends StatelessWidget {
 }
 
 class StoryViewerScreen extends StatelessWidget {
+  final FlutterTts flutterTts = FlutterTts();
+  final TextEditingController textEditingController = TextEditingController();
+
+  speak(String text) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(1);
+    await flutterTts.speak(text);
+  }
+
   final Story story;
-
-  StoryViewerScreen({required this.story});
-
+  StoryViewerScreen({Key? key, required this.story}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +100,7 @@ class StoryViewerScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // Implement interactive elements or read-aloud functionality
+                speak(story.content);
               },
               child: Text('Read Aloud'),
             ),
